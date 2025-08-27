@@ -2,7 +2,7 @@
    "projectName": "5043-vision-forcast",
    "proxy": {
       "/m3api-rest": {
-         "target": "https://example.com:8080",
+         "target": "https://mingle-ionapi.eu1.inforcloudsuite.com/VCEYPCNVT5M73542_DEV",
          "secure": false,
          "changeOrigin": true,
          "logLevel": "debug"
@@ -20,11 +20,11 @@
          "logLevel": "debug"
       },
       "/ODIN_DEV_TENANT": {
-         "target": "ODIN_ION_PROXY_TARGET",
+         "target": "https://mingle-ionapi.eu1.inforcloudsuite.com/VCEYPCNVT5M73542_DEV",
          "secure": false,
          "changeOrigin": true,
          "pathRewrite": {
-            "^/ODIN_DEV_TENANT": "/ODIN_ION_PROXY_TENANT"
+            "^/ODIN_DEV_TENANT": ""
          },
          "logLevel": "debug"
       }

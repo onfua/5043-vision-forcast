@@ -1,0 +1,103 @@
+<div id="dashboard" soho-busyindicator [activated]="isBusyAll" [blockUI]="true" [displayDelay]="0">
+
+   <div class="header-detail">
+      <div class="header" style="height: 400px;">
+         <div class="form-compact-container banner-detail">
+            <section class="detail">
+               <form>
+                  <div class="row header-detail two-columns splitter-container" style="width: 100%;overflow-x: auto;">
+                     <div class="sidebar is-right-side"
+                        style="width: 500px;height:350px;margin-right: 10px; overflow: auto;">
+                        <div>
+                           <div class="row">
+                              <div class="twelve columns form-section-header" style="margin-bottom: 10px;">
+                                 {{i18n.t('filter')}}
+                              </div>
+                           </div>
+                           <div class="row">
+                              <div class="four columns">
+                                 <label for="inpITNO">{{i18n.t('item')}} <span style="color: red;"> *</span></label>
+                                 <input id="inpITNO" (input)="onChangeITNO($event)" (change)="onChangeITNO($event)" soho-lookup [value]="varITNO"
+                                    [columns]="columns_ITNO" [dataset]="data_item" field="ITNO" (keydown)="openLookup($event)"/>
+                              </div>
+                              <div class="four columns">
+                                 <label for="inpITNODEsc">{{i18n.t('item_description')}}</label>
+                                 <input id="inpITNODEsc" [value]="varITDS" readonly />
+                              </div>
+                              <div class="four columns">
+                                 <label for="field-02">{{i18n.t('next_order_number')}}</label>
+                                 <input id="field-02" [value]="varNextOrderNumber" readonly style="cursor:pointer;" (click)="onNextClick()"/>
+                              </div>
+                           </div>
+
+                           <div class="row">
+                              <div class="four columns">
+                                 <label for="inpWHLO">{{i18n.t("WHLO")}} <span style="color: red;"> *</span></label>
+                                 <input id="inpWHLO" (input)="onChangeWHLO($event)" (change)="onChangeWHLO($event)" [value]="varWHLO" soho-lookup
+                                    [columns]="columns_WHLO" [dataset]="data_whlo" field="WHLO" (keydown)="openLookup($event)"/>
+                              </div>
+                              <div class="four columns" style="opacity: 0;">.</div>
+                              <div class="four columns">
+                                 <label for="field-03">{{i18n.t('next_order_date')}}</label>
+                                 <input id="field-03" value="" soho-datepicker dateFormat="MM/dd/yyyy"
+                                    style="max-width: 300px;width : 100%" [locale]="i18n.currentLanguage"
+                                    [value]="varDateNextOrder" readonly />
+                              </div>
+                           </div>
+
+                           <div class="row">
+                              <div class="four columns">
+                                 <label for="field-04">{{i18n.t('StockWHS')}}</label>
+                                 <input id="field-04" [value]="varSTQT" readonly />
+                              </div>
+                              <div class="four columns" style="opacity: 0;">
+                                 <label for="field-05">{{i18n.t('StockPRD')}}</label>
+                                 <input id="field-05" value="" readonly />
+                              </div>
+                              <div class="four columns">
+                                 <label for="field-06">{{i18n.t('next_order_qty')}}</label>
+                                 <input id="field-06" [value]="varNextOrderQty" readonly />
+                              </div>
+                           </div>
+                           <div class="row" style="margin-top: 10px;">
+                              <div class="four columns">
+                                 <button soho-button="primary" (click)="applyFilter()"
+                                    [disabled]="disabled">{{i18n.t('apply')}}</button>
+                              </div>
+                           </div>
+                        </div>
+                        <soho-splitter class="splitter splitter-right" axis="x"></soho-splitter>
+
+                     </div>
+
+                     <div soho-busyindicator [activated]="isForecastBusy" [blockUI]="true" [displayDelay]="0">
+                        <div soho-datagrid [columns]="columns" [data]="data" [selectable]="'single'" [filterable]="true"
+                           rowHeight="short" id="forecastDataGrid" name="forecastDataGrid"
+                           [emptyMessage]="stockEmptyMessage" rowHeight="small"></div>
+                     </div>
+                  </div>
+               </form>
+            </section>
+         </div>
+      </div>
+      <soho-splitter axis="y" id="split"></soho-splitter>
+      <div soho-busyindicator [activated]="isOis302Busy" [blockUI]="true" [displayDelay]="0" class="detail"
+         style="margin-top: 10px;">
+         <div class="form-section-header" style="margin-bottom: 10px;">
+            OIS302 {{i18n.t('ois302')}}
+         </div>
+         <div menuId="action-popupmenu" id="ois300DataGrid" style="min-height: 400px;" soho-datagrid [columns]="ois302columns" [data]="dataOis302"
+            [selectable]="'single'" [filterable]="true" rowHeight="short" class="datagridP" name="degD"
+            [emptyMessage]="stockEmptyMessage"
+            (contextMenu)="getPosition($event)"></div>
+      </div>
+   </div>
+   <ul soho-popupmenu id="action-popupmenu">
+      <li soho-popupmenu-item *ngFor="let menuEntry of contextEntries" [isDisabled]="menuEntry.disabled" (click)="menuEntry.click()">
+         <a soho-popupmenu-label *ngIf="!menuEntry.url" menuId="{{menuEntry.id}}">{{menuEntry.displayString}}<span
+               class="shortcut-text" >{{menuEntry.shortcut}}</span></a>
+         <a soho-popupmenu-label *ngIf="menuEntry.url" menuUrl="{{menuEntry.url}}">{{menuEntry.displayString}}<span
+               class="shortcut-text">{{menuEntry.shortcut}}</span></a>
+      </li>
+   </ul>
+</div>

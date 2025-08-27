@@ -1,0 +1,46 @@
+{
+   "name" : "Vision Forecast",
+   "version" : "1.0",
+   "APIs" : [
+      {
+         "program":"MMS005MI",
+         "transaction":"LstWarehouses"
+      },
+      {
+         "program":"MNS150MI",
+         "transaction":"GetUserData"
+      },
+      {
+         "program":"MMS200MI",
+         "transaction":"LstItmWhsByWhs"
+      },
+      {
+         "program":"MMS200MI",
+         "transaction":"GetItmWhsBal"
+      },
+      {
+         "program":"MMS200MI",
+         "transaction":"GetItmWhsBasic"
+      },
+      {
+         "program":"EXPORTMI",
+         "transaction":"Select"
+      },
+      {
+         "program":"MMS100MI",
+         "transaction":"GetHead"
+      },
+      {
+         "program":"MMS080MI",
+         "transaction":"LstMtPlByItmWhs"
+      },
+      {
+         "program":"RPS045MI",
+         "transaction":"LstByWarehouse"
+      },
+      {
+         "program":"RPS045MI",
+         "transaction":"LstItems"
+      }
+   ]
+}

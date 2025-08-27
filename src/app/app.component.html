@@ -1,71 +1,46 @@
 <soho-icons-new></soho-icons-new>
 <soho-icons-empty-new></soho-icons-empty-new>
 
+<div class="head">
+   <div class="title"><svg _ngcontent-amf-c22="" focusable="false" aria-hidden="true" role="presentation" class="icon icon-logo"><use _ngcontent-amf-c22="" href="#icon-logo"></use></svg><span>{{i18n.t('VISION_FORECAST')}}</span></div>
+   <div class="version" (click)="showVersion()">V{{ version.version }}</div>
+</div>
+
 <div
   soho-busyindicator
   [activated]="isBusy"
   [blockUI]="true"
   [displayDelay]="0"
-  [style.padding.rem]="4"
+  [style.padding.rem]="2"
+  id="main"
+  style="overflow-y: scroll; height: calc(100vh - 40px);"
 >
-  <div class="row card top-padding" [style.height.%]="100">
-    <div class="form-responsive row">
-      <div class="six columns">
-        <div class="field">
-          <h1>User context</h1>
-          <p>
-            Click the Load button to show all M3 user context values current
-            values that will differ if running within H5 and for example the
-            company has been changed.
-          </p>
-        </div>
-        <button soho-button="primary" (click)="onClickLoad()">Load</button>
-      </div>
-    </div>
-    <div class="form-responsive row top-padding">
-      <div class="six columns">
-        <div class="field">
-          <label for="di-cono">Company</label>
-          <input id="di-cono" [(ngModel)]="company" readonly />
-        </div>
-      </div>
-      <div class="six columns">
-        <div class="field">
-          <label for="di-ccono">Current company</label>
-          <input id="di-ccono" [(ngModel)]="currentCompany" readonly />
-        </div>
-      </div>
-    </div>
+   <app-dashboard/>
+</div>
 
-    <div class="form-responsive row">
-      <div class="six columns">
-        <div class="field">
-          <label for="di-divi">Division</label>
-          <input id="di-divi" [(ngModel)]="division" readonly />
-        </div>
-      </div>
-
-      <div class="six columns">
-        <div class="field">
-          <label for="di-cdivi">Current division</label>
-          <input id="di-cdivi" [(ngModel)]="currentDivision" readonly />
-        </div>
-      </div>
-    </div>
-
-    <div class="form-responsive row">
-      <div class="six columns">
-        <div class="field">
-          <label for="di-lang">Language</label>
-          <input id="di-lang" [(ngModel)]="language" readonly />
-        </div>
-      </div>
-      <div class="six columns">
-        <div class="field">
-          <label for="di-clang">Current language</label>
-          <input id="di-clang" [(ngModel)]="currentLanguage" readonly />
-        </div>
-      </div>
-    </div>
-  </div>
+<div id="modal-version" class="hidden">
+   <div>
+      <svg class="icon about-logo" focusable="false" aria-hidden="true" role="presentation" viewBox="0 0 44 44"><use href="#icon-logo"></use></svg>
+   </div>
+   <h2>{{version.name}}</h2>
+   <div class="ver_desc">
+      <p>H5 SDK V{{version.version}}</p>
+      <br/>
+      <div [innerHTML]="allapi"></div>
+      <br/>
+      <p>{{i18n.t('copyright')}} <a href="http://www.infor.com">www.infor.com</a>.</p>
+      <br/>
+      <p>
+         Platform: {{system.platform}} <br/>
+         Locale: {{locale}} <br/>
+         Language: {{language}} <br/>
+         Browser: {{browser}} <br/>
+         Coockies enabled: {{system.cookieEnabled}}
+      </p>
+   </div>
+   <button (click)="copyToClip()" style="align-self: flex-end;">
+      <svg role="presentation" aria-hidden="true" focusable="false" class="icon" id="copy-clip">
+         <use href="#icon-copy"></use>
+       </svg>
+   </button>
 </div>

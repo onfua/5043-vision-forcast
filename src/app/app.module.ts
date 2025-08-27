@@ -5,16 +5,18 @@ import { Log } from '@infor-up/m3-odin';
 import { M3OdinModule } from '@infor-up/m3-odin-angular';
 import { SohoComponentsModule } from 'ids-enterprise-ng'; // TODO Consider only importing individual SoHo modules in production
 import { AppComponent } from './app.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 @NgModule({
    declarations: [
-      AppComponent
+      AppComponent,
+      DashboardComponent
    ],
    imports: [
       BrowserModule,
       FormsModule,
       SohoComponentsModule,
-      M3OdinModule
+      M3OdinModule,
    ],
    providers: [
       {
@@ -31,7 +33,7 @@ import { AppComponent } from './app.component';
             });
          },
          deps: [LOCALE_ID],
-      }
+      },
    ],
    bootstrap: [AppComponent]
 })
