@@ -757,109 +757,140 @@ export class DashboardComponent implements AfterViewInit, OnInit {
       } catch { }
 
       const itToUse = plan_item ? plan_item : this.varITNO
+      const results = [];
 
-      const req: IMIRequest = {
-         program: 'EXPORTMI',
-         transaction: 'Select',
+      //Use MMS080MI.SelForcTrans to get forecast data if the test is not conclusive
+
+      // START------------------------------------- MMS080MI.SelForcTrans/-------------------------------------
+
+      const reqMMS080: IMIRequest = {
+         program: 'MMS080MI',
+         transaction: 'SelForcTrans',
          record: {
-            SEPC: ';',
-            QERY: `FDFODY, FDDFOR from MITDFO where FDWHLO = '${this.varWHLO}' and FDITNO = '${itToUse}' and FDFODY >= '${formatedDate}'`,
+            FWHL: this.varWHLO,
+            TWHL: this.varWHLO
          },
          maxReturnedRecords: 0,
       };
-      const results = [];
 
       try {
-         const response = await this.miService.execute(req).toPromise();
-         const tmp = response.items.sort((a, b) => {
-            const aDate = a['REPL'].split(';')[0];
-            const bDate = b['REPL'].split(';')[0];
-            return Number(aDate) - Number(bDate);
-         }).reduce((acc, item) => {
-            if (acc.length === 0) {
-               return [{
-                  PLDT: item['REPL'].split(';')[0],
-                  TYPE: this.i18n.t('Forecast'),
-                  ORQA: parseFloat(item['REPL'].split(';')[1]),
-                  DWDT: item['REPL'].split(';')[0]
-               }]
-            } else {
-               if (acc[acc.length - 1].PLDT.substring(0, 6) === item['REPL'].split(';')[0].substring(0, 6)) {
-                  const tmp = acc
-                  tmp[tmp.length - 1].ORQA += parseFloat(item['REPL'].split(';')[1]);
-                  return tmp;
-               } else {
-                  return [...acc, {
-                     PLDT: item['REPL'].split(';')[0],
-                     TYPE: this.i18n.t('Forecast'),
-                     ORQA: parseFloat(item['REPL'].split(';')[1]),
-                     DWDT: item['REPL'].split(';')[0]
-                  }]
-               }
-            }
-         }, [])
+         const resMMS080 = await this.miService.execute(reqMMS080).toPromise();
+         const { items } = resMMS080
 
-         const req2: IMIRequest = {
-            program: 'MMS080MI',
-            transaction: 'LstMtPlByItmWhs',
-            record: {
-               WHLO: this.varWHLO,
-               ITNO: itToUse
-            },
-            outputFields: ['PLDT', 'REQT'],
-            maxReturnedRecords: 0,
-         };
-
-         try {
-            const response2 = await this.miService.execute(req2).toPromise();
-            const resSum = response2.items.sort((a, b) => {
-               const aDate = a['PLDT'];
-               const bDate = b['PLDT'];
-               return Number(aDate) - Number(bDate);
-            }).reduce((acc, item) => {
-               if (acc.length === 0) {
-                  return [{
-                     PLDT: item['PLDT'].substring(0, 6),
-                     REQT: parseFloat(item['REQT'])
-                  }]
-               } else {
-                  if (acc[acc.length - 1].PLDT === item['PLDT'].split(';')[0].substring(0, 6)) {
-                     const tmp = acc
-                     tmp[tmp.length - 1].REQT += parseFloat(item['REQT']);
-                     return tmp;
-                  } else {
-                     return [...acc, {
-                        PLDT: item['PLDT'].substring(0, 6),
-                        REQT: parseFloat(item['REQT'])
-                     }]
-                  }
-               }
-            }, [])
-
-            results.push(...tmp.reduce((acc, item) => {
-               const found = resSum.find(res => res.PLDT === item.PLDT.substring(0, 6));
-               if (found) {
-                  return [...acc, {
-                     PLDT: item.PLDT,
-                     TYPE: item.TYPE,
-                     ORQA: item.ORQA - found.REQT,
-                     DWDT: item.DWDT
-                  }];
-               } else {
-                  return [...acc, item];
-               }
-            }, []))
-            results.forEach((res, idx) => {
-               if (res.ORQA <= 0) results.splice(idx, 1)
-            })
-         } catch (error) {
-            console.error('Error fetching reserved quantity:', error);
+         if (items.length > 0) {
+            results.push(...items.filter(item => item.ITNO === itToUse && item.CONO == this.cono && item.WHLO === this.varWHLO).map(item => ({
+               PLDT: item.PLDT,
+               TYPE: this.i18n.t('Forecast'),
+               ORQA: parseFloat(item.RNQT),
+               DWDT: item.PLDT
+            })).filter(res => res.ORQA > 0))
          }
+      } catch { }
+
+      // END ------------------------------------- MMS080MI.SelForcTrans/-------------------------------------
+
+      // const req: IMIRequest = {
+      //    program: 'EXPORTMI',
+      //    transaction: 'Select',
+      //    record: {
+      //       SEPC: ';',
+      //       QERY: `FDFODY, FDDFOR from MITDFO where FDWHLO = '${this.varWHLO}' and FDITNO = '${itToUse}' and FDFODY >= '${formatedDate}'`,
+      //    },
+      //    maxReturnedRecords: 0,
+      // };
 
 
-      } catch (error) {
-         console.error('Error fetching forecast data:', error);
-      }
+      // try {
+      //    const response = await this.miService.execute(req).toPromise();
+      //    const tmp = response.items.sort((a, b) => {
+      //       const aDate = a['REPL'].split(';')[0];
+      //       const bDate = b['REPL'].split(';')[0];
+      //       return Number(aDate) - Number(bDate);
+      //    }).reduce((acc, item) => {
+      //       if (acc.length === 0) {
+      //          return [{
+      //             PLDT: item['REPL'].split(';')[0],
+      //             TYPE: this.i18n.t('Forecast'),
+      //             ORQA: parseFloat(item['REPL'].split(';')[1]),
+      //             DWDT: item['REPL'].split(';')[0]
+      //          }]
+      //       } else {
+      //          if (acc[acc.length - 1].PLDT.substring(0, 6) === item['REPL'].split(';')[0].substring(0, 6)) {
+      //             const tmp = acc
+      //             tmp[tmp.length - 1].ORQA += parseFloat(item['REPL'].split(';')[1]);
+      //             return tmp;
+      //          } else {
+      //             return [...acc, {
+      //                PLDT: item['REPL'].split(';')[0],
+      //                TYPE: this.i18n.t('Forecast'),
+      //                ORQA: parseFloat(item['REPL'].split(';')[1]),
+      //                DWDT: item['REPL'].split(';')[0]
+      //             }]
+      //          }
+      //       }
+      //    }, [])
+
+      //    const req2: IMIRequest = {
+      //       program: 'MMS080MI',
+      //       transaction: 'LstMtPlByItmWhs',
+      //       record: {
+      //          WHLO: this.varWHLO,
+      //          ITNO: itToUse
+      //       },
+      //       outputFields: ['PLDT', 'REQT'],
+      //       maxReturnedRecords: 0,
+      //    };
+
+      //    try {
+      //       const response2 = await this.miService.execute(req2).toPromise();
+      //       const resSum = response2.items.sort((a, b) => {
+      //          const aDate = a['PLDT'];
+      //          const bDate = b['PLDT'];
+      //          return Number(aDate) - Number(bDate);
+      //       }).reduce((acc, item) => {
+      //          if (acc.length === 0) {
+      //             return [{
+      //                PLDT: item['PLDT'].substring(0, 6),
+      //                REQT: parseFloat(item['REQT'])
+      //             }]
+      //          } else {
+      //             if (acc[acc.length - 1].PLDT === item['PLDT'].split(';')[0].substring(0, 6)) {
+      //                const tmp = acc
+      //                tmp[tmp.length - 1].REQT += parseFloat(item['REQT']);
+      //                return tmp;
+      //             } else {
+      //                return [...acc, {
+      //                   PLDT: item['PLDT'].substring(0, 6),
+      //                   REQT: parseFloat(item['REQT'])
+      //                }]
+      //             }
+      //          }
+      //       }, [])
+
+      //       results.push(...tmp.reduce((acc, item) => {
+      //          const found = resSum.find(res => res.PLDT === item.PLDT.substring(0, 6));
+      //          if (found) {
+      //             return [...acc, {
+      //                PLDT: item.PLDT,
+      //                TYPE: item.TYPE,
+      //                ORQA: item.ORQA - found.REQT,
+      //                DWDT: item.DWDT
+      //             }];
+      //          } else {
+      //             return [...acc, item];
+      //          }
+      //       }, []))
+      //       results.forEach((res, idx) => {
+      //          if (res.ORQA <= 0) results.splice(idx, 1)
+      //       })
+      //    } catch (error) {
+      //       console.error('Error fetching reserved quantity:', error);
+      //    }
+
+
+      // } catch (error) {
+      //    console.error('Error fetching forecast data:', error);
+      // }
       return results;
    }
 
