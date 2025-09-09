@@ -49,5 +49,6 @@
    "ois302" : "Commande client. Atelier des lignes ouvertes",
    "change" : "Changer",
    "delete" : "Supprimer",
-   "display" : "Afficher"
+   "display" : "Afficher",
+   "with_prem": "Avec les Préliminaires"
 }

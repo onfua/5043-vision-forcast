@@ -17,6 +17,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
    columns_WHLO: SohoDataGridColumn[] = [];
    columns_ITNO: SohoDataGridColumn[] = [];
    stockEmptyMessage: SohoEmptyMessageOptions = {};
+   all_data = [];
    data = [];
    varWHLO: string = '';
    varITNO: string = '';
@@ -35,6 +36,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
    isBusyAll: boolean = false;
    dataOis302: any[] = []
    isOis302Busy: boolean = false
+   isPrelim: boolean = true
    positionContext = {
       cell: 0,
       row: 0
@@ -79,6 +81,14 @@ export class DashboardComponent implements AfterViewInit, OnInit {
             forecastDataGrid.setAttribute('style', `height: ${rect.top - 80}px;`);
          }
       }, 100);
+   }
+
+   onChangeAuto(event: any) {
+      this.isPrelim = event.target.checked
+      this.data = this.all_data.filter(item => {
+         if (this.isPrelim) return true
+         return item.TYPE === this.i18n.t('Forecast') || (item.WHSL && item.WHSL.substring(0, 1) !== '1')
+      })
    }
 
    async onChangeWHLO(event: any) {
@@ -192,7 +202,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
       const co = await this.getDataForCO();  //get all customer orders data
       let all = this.mixData(fo, co)
       all = this.calculateBalance(all);
-      this.data = all.map(item => ({
+      this.all_data = all.map(item => ({
          PRDT: item.PLDT,
          PRDTT: item.DWDT,
          TYPE: item.TYPE,
@@ -204,6 +214,10 @@ export class DashboardComponent implements AfterViewInit, OnInit {
          ATV1: item.ORNO,
          ATV2: item.ORTP,
       }))
+      this.data = this.all_data.filter(item => {
+         if (this.isPrelim) return true
+         return item.TYPE === this.i18n.t('Forecast') || (item.WHSL && item.WHSL.substring(0, 1) !== '1')
+      })
       this.isForecastBusy = false;
    }
 

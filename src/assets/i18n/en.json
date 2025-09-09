@@ -49,5 +49,6 @@
    "ois302" : "Customer Order. Open Line Workbench",
    "change" : "Change",
    "delete" : "Delete",
-   "display" : "Display"
+   "display" : "Display",
+   "with_prem": "With Preliminary"
 }

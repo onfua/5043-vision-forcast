@@ -17,8 +17,9 @@
                            <div class="row">
                               <div class="four columns">
                                  <label for="inpITNO">{{i18n.t('item')}} <span style="color: red;"> *</span></label>
-                                 <input id="inpITNO" (input)="onChangeITNO($event)" (change)="onChangeITNO($event)" soho-lookup [value]="varITNO"
-                                    [columns]="columns_ITNO" [dataset]="data_item" field="ITNO" (keydown)="openLookup($event)"/>
+                                 <input id="inpITNO" (input)="onChangeITNO($event)" (change)="onChangeITNO($event)"
+                                    soho-lookup [value]="varITNO" [columns]="columns_ITNO" [dataset]="data_item"
+                                    field="ITNO" (keydown)="openLookup($event)" />
                               </div>
                               <div class="four columns">
                                  <label for="inpITNODEsc">{{i18n.t('item_description')}}</label>
@@ -26,15 +27,17 @@
                               </div>
                               <div class="four columns">
                                  <label for="field-02">{{i18n.t('next_order_number')}}</label>
-                                 <input id="field-02" [value]="varNextOrderNumber" readonly style="cursor:pointer;" (click)="onNextClick()"/>
+                                 <input id="field-02" [value]="varNextOrderNumber" readonly style="cursor:pointer;"
+                                    (click)="onNextClick()" />
                               </div>
                            </div>
 
                            <div class="row">
                               <div class="four columns">
                                  <label for="inpWHLO">{{i18n.t("WHLO")}} <span style="color: red;"> *</span></label>
-                                 <input id="inpWHLO" (input)="onChangeWHLO($event)" (change)="onChangeWHLO($event)" [value]="varWHLO" soho-lookup
-                                    [columns]="columns_WHLO" [dataset]="data_whlo" field="WHLO" (keydown)="openLookup($event)"/>
+                                 <input id="inpWHLO" (input)="onChangeWHLO($event)" (change)="onChangeWHLO($event)"
+                                    [value]="varWHLO" soho-lookup [columns]="columns_WHLO" [dataset]="data_whlo"
+                                    field="WHLO" (keydown)="openLookup($event)" />
                               </div>
                               <div class="four columns" style="opacity: 0;">.</div>
                               <div class="four columns">
@@ -63,6 +66,14 @@
                               <div class="four columns">
                                  <button soho-button="primary" (click)="applyFilter()"
                                     [disabled]="disabled">{{i18n.t('apply')}}</button>
+
+                              </div>
+                              <div class="four columns">
+                                 <div class="field">
+                                    <input soho-checkbox type="checkbox" id="isPremId" name="isPremId" [checked]="isPrelim"
+                                       (change)="onChangeAuto($event)" />
+                                    <label soho-label for="isPremId" [forCheckBox]="true">{{i18n.t('with_prem')}}</label>
+                                 </div>
                               </div>
                            </div>
                         </div>
@@ -86,16 +97,16 @@
          <div class="form-section-header" style="margin-bottom: 10px;">
             OIS302 {{i18n.t('ois302')}}
          </div>
-         <div menuId="action-popupmenu" id="ois300DataGrid" style="min-height: 400px;" soho-datagrid [columns]="ois302columns" [data]="dataOis302"
-            [selectable]="'single'" [filterable]="true" rowHeight="short" class="datagridP" name="degD"
-            [emptyMessage]="stockEmptyMessage"
-            (contextMenu)="getPosition($event)"></div>
+         <div menuId="action-popupmenu" id="ois300DataGrid" style="min-height: 400px;" soho-datagrid
+            [columns]="ois302columns" [data]="dataOis302" [selectable]="'single'" [filterable]="true" rowHeight="short"
+            class="datagridP" name="degD" [emptyMessage]="stockEmptyMessage" (contextMenu)="getPosition($event)"></div>
       </div>
    </div>
    <ul soho-popupmenu id="action-popupmenu">
-      <li soho-popupmenu-item *ngFor="let menuEntry of contextEntries" [isDisabled]="menuEntry.disabled" (click)="menuEntry.click()">
+      <li soho-popupmenu-item *ngFor="let menuEntry of contextEntries" [isDisabled]="menuEntry.disabled"
+         (click)="menuEntry.click()">
          <a soho-popupmenu-label *ngIf="!menuEntry.url" menuId="{{menuEntry.id}}">{{menuEntry.displayString}}<span
-               class="shortcut-text" >{{menuEntry.shortcut}}</span></a>
+               class="shortcut-text">{{menuEntry.shortcut}}</span></a>
          <a soho-popupmenu-label *ngIf="menuEntry.url" menuUrl="{{menuEntry.url}}">{{menuEntry.displayString}}<span
                class="shortcut-text">{{menuEntry.shortcut}}</span></a>
       </li>
