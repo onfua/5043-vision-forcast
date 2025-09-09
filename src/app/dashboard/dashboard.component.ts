@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
 import { I18nService } from '../../services/i18n/i18n.service';
 import { forecastColumns, itnoColumns, ois302Columns, whloColumns } from '../../utils/columns';
-import { IMIRequest } from '@infor-up/m3-odin';
-import { ApplicationService, MIService, UserService } from '@infor-up/m3-odin-angular';
+import { IBookmark, IMIRequest } from '@infor-up/m3-odin';
+import { ApplicationService, MIService, FormService } from '@infor-up/m3-odin-angular';
 
 @Component({
    selector: 'app-dashboard',
@@ -22,6 +22,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
    varITNO: string = '';
    varITDS: string = '';
    varSTQT: string = '';
+   varSSQT: string = '';
    varNextOrderNumber: string = '';
    varDateNextOrder: string = '';
    varNextOrderQty: string = '';
@@ -50,7 +51,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
       this.positionContext.row = event.row
    }
 
-   constructor(private miService: MIService, private appService: ApplicationService) {
+   constructor(private miService: MIService, private appService: ApplicationService, private formService: FormService) {
       this.updateColumns();
       this.i18n.on('languageChanged', () => {
          this.updateColumns();
@@ -63,6 +64,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
       await this.getWHLOData()
       await this.getItem();
       this.isBusyAll = false;
+
    }
    ngAfterViewInit(): void {
       const splitElement = document.getElementById('split');
@@ -198,6 +200,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
          WHSL: item.ORST,
          STQT: item.STQT,
          PRTS: item.CUNO,
+         CUNM: item.CUNM,
          ATV1: item.ORNO,
          ATV2: item.ORTP,
       }))
@@ -237,8 +240,10 @@ export class DashboardComponent implements AfterViewInit, OnInit {
          reqDelDa: this.i18n.t('ReqDelDate'),
          qtyReq: this.i18n.t('qtyReq'),
          allocated: this.i18n.t('allocated'),
+         balance_th: this.i18n.t('balance_th'),
          balance: this.i18n.t('balance'),
          customer: this.i18n.t('customer'),
+         customer_name: this.i18n.t('customer_name'),
          CONumber: this.i18n.t('CONumber'),
          COType: this.i18n.t('COType'),
          clickPRDT: () => {
@@ -434,6 +439,24 @@ export class DashboardComponent implements AfterViewInit, OnInit {
       try {
          const response = await this.miService.execute(req).toPromise();
          this.varSTQT = response.item['STQT'] || '';
+
+      } catch (error) {
+         console.error('Error fetching items:', error);
+      }
+
+      const req2: IMIRequest = {
+         program: 'MMS200MI',
+         transaction: 'GetItmWhsBasic',
+         record: {
+            WHLO: this.varWHLO,
+            ITNO: this.varITNO
+         },
+         maxReturnedRecords: 0,
+      };
+
+      try {
+         const response2 = await this.miService.execute(req2).toPromise();
+         this.varSSQT = response2.item['SSQT'] || '';
 
       } catch (error) {
          console.error('Error fetching items:', error);
@@ -668,6 +691,18 @@ export class DashboardComponent implements AfterViewInit, OnInit {
                      result.ORQA = sum;
                      result.ORST = response1.items[0]['REPL'].split(';')[2];
                      result.CUNO = response1.items[0]['REPL'].split(';')[3];
+                     const reqCust: IMIRequest = {
+                        program: 'CRS610MI',
+                        transaction: 'GetBasicData',
+                        record: {
+                           CUNO: result.CUNO
+                        },
+                        maxReturnedRecords: 0,
+                     };
+                     try {
+                        const resCust = await this.miService.execute(reqCust).toPromise();
+                        result.CUNM = resCust.item['CUNM'] || '';
+                     } catch { }
                   }
                } catch (error) {
                   console.error('Error fetching Requested Delivery Date:', error);
@@ -959,10 +994,20 @@ export class DashboardComponent implements AfterViewInit, OnInit {
     * @returns
     */
    private calculateBalance(items: any[]) {
+      let cummul = this.varSTQT ? parseFloat(this.varSTQT) : 0
       return items.reduce((acc, item, idx, arr) => {
+         let not_prelim = false
+         if ((item.ORST && item.ORST.substring(0, 1) !== '1') || item.TYPE === this.i18n.t('Forecast')) {
+            cummul -= parseFloat(item.ORQA)
+            not_prelim = true
+         }
          return [...acc, {
             ...item,
-            STQT: idx === 0 ? parseFloat(this.varSTQT) - parseFloat(item.ORQA) : parseFloat(acc[idx - 1].STQT) - parseFloat(item.ORQA)
+            STQT: {
+               STQT: idx === 0 ? parseFloat(this.varSTQT) - parseFloat(item.ORQA) : parseFloat(acc[idx - 1].STQT.STQT) - parseFloat(item.ORQA),
+               SSQT: this.varSSQT,
+               STQT_true: not_prelim ? cummul : null
+            }
          }]
       }, []);
    }

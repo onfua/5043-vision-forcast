@@ -9,7 +9,7 @@ export const forecastColumns = (obj: any) => [
          const date = value.toString();
          return `<a style=" color: #0066d4; text-decoration : underline; cursor : pointer">${date.substring(6, 8)}/${date.substring(4, 6)}/${date.substring(0, 4)}</a>`;
       },
-      click : obj.clickPRDT,
+      click: obj.clickPRDT,
       width: 90
    },
    {
@@ -47,32 +47,60 @@ export const forecastColumns = (obj: any) => [
       sortable: true,
       filterType: 'text',
       formatter: (row, cell, value, column, item) => {
+         console.log('status:', value);
+
+         if (value.substring(0, 1) === '1') {
+            setTimeout(() => {
+               $('#forecastDataGrid .datagrid-row:nth-child(' + (row + 1) + ') .datagrid-cell-wrapper').css('background-color', '#d3d3d3ff');
+            }, 100);
+         }
          setTimeout(() => {
-            $('#forecastDataGrid .datagrid-row:nth-child(' + (row + 1) + ') td:nth-child('+ (cell + 1) +')').css('text-align', 'center');
+            $('#forecastDataGrid .datagrid-row:nth-child(' + (row + 1) + ') td:nth-child(' + (cell + 1) + ')').css('text-align', 'center');
          }, 50);
+
          return value === '33' ? '✅' : '';
       },
       width: 70
    },
    {
       id: 'STQT',
+      name: obj.balance_th,
+      field: 'STQT',
+      sortable: true,
+      filterType: 'text',
+      formatter: (row, cell, value, column, item) => {
+         const { STQT } = value
+         return STQT;
+      },
+      width: 90
+   }, {
+      id: 'STQT',
       name: obj.balance,
       field: 'STQT',
       sortable: true,
       filterType: 'text',
       formatter: (row, cell, value, column, item) => {
-         const output = value
-         if (parseFloat(value) < 0) {
+         const { STQT, SSQT, STQT_true } = value
+
+         const useSTQT = STQT_true !== null ? STQT_true : 0
+
+         if (parseFloat(useSTQT) < 0) {
             setTimeout(() => {
                $('#forecastDataGrid .datagrid-row:nth-child(' + (row + 1) + ') .datagrid-cell-wrapper').css('background-color', '#ff9292ff');
             }, 50);
 
          } else {
-            setTimeout(() => {
-               $('#forecastDataGrid .datagrid-row:nth-child(' + (row + 1) + ') .datagrid-cell-wrapper').css({ 'background-color': '#90ff90ff' });
-            }, 50);
+            if (parseFloat(useSTQT) < parseFloat(SSQT)) {
+               setTimeout(() => {
+                  $('#forecastDataGrid .datagrid-row:nth-child(' + (row + 1) + ') .datagrid-cell-wrapper').css({ 'background-color': '#ffad60ff' });
+               }, 50);
+            } else {
+               setTimeout(() => {
+                  $('#forecastDataGrid .datagrid-row:nth-child(' + (row + 1) + ') .datagrid-cell-wrapper').css({ 'background-color': '#90ff90ff' });
+               }, 50);
+            }
          }
-         return output;
+         return `<b>${STQT_true !== null ? STQT_true : ''}</b>`;
       },
       width: 90
    },
@@ -80,6 +108,14 @@ export const forecastColumns = (obj: any) => [
       id: 'PRTS',
       name: obj.customer,
       field: 'PRTS',
+      sortable: true,
+      filterType: 'text',
+      width: 100
+   },
+   {
+      id: 'CUNM',
+      name: obj.customer_name,
+      field: 'CUNM',
       sortable: true,
       filterType: 'text',
       width: 200
@@ -91,12 +127,12 @@ export const forecastColumns = (obj: any) => [
       sortable: true,
       filterType: 'text',
       formatter: (row, cell, value, column, item) => {
-         if (value){
+         if (value) {
             return `<a style=" color: #0066d4; text-decoration : underline; cursor : pointer">${value}</a>`;
          }
          return value;
       },
-      click : obj.clickORNO,
+      click: obj.clickORNO,
       width: 150
    },
    {
@@ -118,12 +154,12 @@ export const ois302Columns = (obj: any) => [
       filterType: 'text',
       width: 120,
       formatter: (row, cell, value, column, item) => {
-         if (value){
+         if (value) {
             return `<a style=" color: #0066d4; text-decoration : underline; cursor : pointer">${value}</a>`;
          }
          return value;
       },
-      click : obj.clickITNO
+      click: obj.clickITNO
    },
    {
       id: 'CODT',
@@ -146,7 +182,7 @@ export const ois302Columns = (obj: any) => [
       width: 150,
       formatter: (row, cell, value, column, item) => {
          let color = '#ffffff'
-         const val = value.substring(0,1)
+         const val = value.substring(0, 1)
          if (val === '1') color = '#ff65b2ff'
          if (val === '2') color = '#00d3c8ff'
          if (val === '3') color = '#b0ff31ff'
@@ -168,12 +204,12 @@ export const ois302Columns = (obj: any) => [
       filterType: 'text',
       width: 150,
       formatter: (row, cell, value, column, item) => {
-         if (value){
+         if (value) {
             return `<a style=" color: #0066d4; text-decoration : underline; cursor : pointer">${value}</a>`;
          }
          return value;
       },
-      click : obj.clickORNO
+      click: obj.clickORNO
    },
    {
       id: 'PONR',
@@ -198,7 +234,7 @@ export const ois302Columns = (obj: any) => [
       filterType: 'text',
       width: 70,
       formatter: (row, cell, value, column, item) => {
-         if (value === "0"){
+         if (value === "0") {
             return ``;
          }
          return value;
