@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
 import { I18nService } from '../../services/i18n/i18n.service';
 import { forecastColumns, itnoColumns, ois302Columns, whloColumns } from '../../utils/columns';
-import { IBookmark, IMIRequest } from '@infor-up/m3-odin';
+import { IMIRequest } from '@infor-up/m3-odin';
 import { ApplicationService, MIService, FormService } from '@infor-up/m3-odin-angular';
 
 @Component({
@@ -24,6 +24,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
    varITDS: string = '';
    varSTQT: string = '';
    varSSQT: string = '';
+   varAV01: string = '';
    varNextOrderNumber: string = '';
    varDateNextOrder: string = '';
    varNextOrderQty: string = '';
@@ -35,8 +36,10 @@ export class DashboardComponent implements AfterViewInit, OnInit {
    isForecastBusy: boolean = false;
    isBusyAll: boolean = false;
    dataOis302: any[] = []
+   all_data_OIS302: any[] = []
    isOis302Busy: boolean = false
    isPrelim: boolean = true
+   isUnder: boolean = true
    positionContext = {
       cell: 0,
       row: 0
@@ -91,14 +94,24 @@ export class DashboardComponent implements AfterViewInit, OnInit {
       })
    }
 
+   onChangeAutoUnder(event: any) {
+      this.isUnder = event.target.checked
+      this.dataOis302 = this.all_data_OIS302.filter(item => {
+         if (!this.isUnder) return true
+         return parseFloat(item.ORST) < 66
+      })
+   }
+
    async onChangeWHLO(event: any) {
       this.disabled = true
       this.isBusyAll = true
       this.varWHLO = event.values ? event.values : event.target.value;
       await this.getItem();
       if (this.varITNO !== '' && this.varWHLO !== '') {
-         if (this.data_item.find((a) => { return a.ITNO === this.varITNO })) {
+         const tmp = this.data_item.find((a) => { return a.ITNO === this.varITNO })
+         if (tmp) {
             await this.calculHeader()
+            this.varITDS = tmp[0] ? tmp[0].ITDS : tmp.ITDS
             this.disabled = false
          } else {
             this.disabled = true
@@ -188,7 +201,9 @@ export class DashboardComponent implements AfterViewInit, OnInit {
    async applyFilter() {
       await Promise.all([
          this.loadForecastData(),
-         this.loadOis302Data()
+         this.loadOis302Data(),
+         this.getNextDetail(),
+         this.getStockItem()
       ]);
    }
 
@@ -224,7 +239,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
    private async loadOis302Data() {
       this.isOis302Busy = true
       const data = await this.getOis302Data()
-      this.dataOis302 = data.map(item => ({
+      this.all_data_OIS302 = data.map(item => ({
          ITNO: item.OBITNO,
          CODT: item.OBCODT,
          ORST: item.OBORST,
@@ -242,6 +257,10 @@ export class DashboardComponent implements AfterViewInit, OnInit {
          IVQT: Number(item.OBIVQT),
          FACI: item.OBFACI,
       }))
+      this.dataOis302 = this.all_data_OIS302.filter(item => {
+         if (!this.isUnder) return true
+         return parseFloat(item.ORST) < 66
+      })
       this.isOis302Busy = false
    }
 
@@ -453,6 +472,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
       try {
          const response = await this.miService.execute(req).toPromise();
          this.varSTQT = response.item['STQT'] || '';
+         this.varAV01 = response.item['AV01'] || '';
 
       } catch (error) {
          console.error('Error fetching items:', error);
@@ -615,7 +635,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
          const tmp = resT.items.sort((a, b) => {
             return Number(a.PLDT) - Number(b.PLDT)
          }).filter((a) => {
-            return a.ORCA.substring(0, 1) === '2' || a.ORCA.substring(0, 1) === '5'
+            return a.ORCA === '251' || a.ORCA === '281' || a.ORCA === '501' || a.ORCA === '511'
          })
 
          if (tmp[0]) {

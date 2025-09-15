@@ -50,5 +50,7 @@
    "change" : "Change",
    "delete" : "Delete",
    "display" : "Display",
-   "with_prem": "With Preliminary"
+   "with_prem": "With Preliminary",
+   "item_alloc_net" : "Allocatable net",
+   "with_77" : "OIS302 hide delivered"
 }

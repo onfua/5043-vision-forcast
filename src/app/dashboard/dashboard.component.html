@@ -39,7 +39,10 @@
                                     [value]="varWHLO" soho-lookup [columns]="columns_WHLO" [dataset]="data_whlo"
                                     field="WHLO" (keydown)="openLookup($event)" />
                               </div>
-                              <div class="four columns" style="opacity: 0;">.</div>
+                              <div class="four columns">
+                                 <label for="inpAV01">{{i18n.t('item_alloc_net')}}</label>
+                                 <input id="inpAV01" [value]="varAV01" readonly />
+                              </div>
                               <div class="four columns">
                                  <label for="field-03">{{i18n.t('next_order_date')}}</label>
                                  <input id="field-03" value="" soho-datepicker dateFormat="MM/dd/yyyy"
@@ -73,6 +76,13 @@
                                     <input soho-checkbox type="checkbox" id="isPremId" name="isPremId" [checked]="isPrelim"
                                        (change)="onChangeAuto($event)" />
                                     <label soho-label for="isPremId" [forCheckBox]="true">{{i18n.t('with_prem')}}</label>
+                                 </div>
+                              </div>
+                              <div class="four columns">
+                                 <div class="field">
+                                    <input soho-checkbox type="checkbox" id="isUnder" name="isUnder" [(ngModel)]="isUnder"
+                                       (change)="onChangeAutoUnder($event)" />
+                                    <label soho-label for="isUnder" [forCheckBox]="true">{{i18n.t('with_77')}}</label>
                                  </div>
                               </div>
                            </div>

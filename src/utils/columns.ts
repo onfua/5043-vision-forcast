@@ -58,7 +58,7 @@ export const forecastColumns = (obj: any) => [
             $('#forecastDataGrid .datagrid-row:nth-child(' + (row + 1) + ') td:nth-child(' + (cell + 1) + ')').css('text-align', 'center');
          }, 50);
 
-         return value === '33' ? '✅' : '';
+         return parseFloat(value) >= 33 ? '✅' : '';
       },
       width: 70
    },

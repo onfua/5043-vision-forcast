@@ -50,5 +50,7 @@
    "change" : "Changer",
    "delete" : "Supprimer",
    "display" : "Afficher",
-   "with_prem": "Avec les Préliminaires"
+   "with_prem": "Avec les Préliminaires",
+   "item_alloc_net" : "Net affectable",
+   "with_77" : "OIS302 masquer les livrés"
 }
